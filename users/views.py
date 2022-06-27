@@ -16,6 +16,20 @@ class UserView(generics.ListCreateAPIView):
     serializer_class = UserSerializer
 
 
+class ListNumberOfUsersView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        max_users = self.kwargs["num"]
+        return self.queryset.order_by("-date_joined")[0:max_users]
+
+
+class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 class UserLoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
