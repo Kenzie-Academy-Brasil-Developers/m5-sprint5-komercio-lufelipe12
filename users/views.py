@@ -1,3 +1,37 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth import authenticate
+from rest_framework import generics
+from rest_framework.views import APIView, Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework import status
 
-# Create your views here.
+from .serializers import UserSerializer, UserLoginSerializer
+from .models import User
+
+
+class UserView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserLoginView(APIView):
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = authenticate(
+            username=serializer.validated_data["email"],
+            password=serializer.validated_data["password"],
+        )
+
+        if user:
+            token, _ = Token.objects.get_or_create(user=user)
+
+            return Response({"token": token.key})
+
+        return Response(
+            {"detail": "invalid email or password"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
