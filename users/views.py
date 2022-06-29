@@ -3,12 +3,18 @@ from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.views import APIView, Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 
-from .serializers import UserSerializer, UserLoginSerializer
+from .serializers import (
+    UserSerializer,
+    UserLoginSerializer,
+    DeactivateAccountSerializer,
+)
 from .models import User
+from .permissions import IsAccountOwner, IsAdminUser
 
 
 class UserView(generics.ListCreateAPIView):
@@ -28,6 +34,8 @@ class ListNumberOfUsersView(generics.ListAPIView):
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAccountOwner]
 
 
 class UserLoginView(APIView):
@@ -49,3 +57,11 @@ class UserLoginView(APIView):
             {"detail": "invalid email or password"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
+
+
+class AccountManagementView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = DeactivateAccountSerializer
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
