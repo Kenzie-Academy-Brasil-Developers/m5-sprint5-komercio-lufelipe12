@@ -19,7 +19,10 @@ class ProductSerializer(serializers.ModelSerializer):
             "is_active",
             "seller",
         ]
-        extra_kwargs = {"is_active": {"default": True}}
+        extra_kwargs = {
+            "is_active": {"default": True},
+            "quantity": {"min_value": 0},
+        }
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):

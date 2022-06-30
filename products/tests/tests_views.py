@@ -20,6 +20,12 @@ class ProductsViewsTest(APITestCase):
             "quantity": 1,
         }
 
+        cls.wrong_product_negative = {
+            "description": "Bike Maluca",
+            "price": 100.5,
+            "quantity": -1,
+        }
+
         cls.user_buyer = {
             "email": "lf@g.com",
             "password": "1234",
@@ -84,7 +90,6 @@ class ProductsViewsTest(APITestCase):
         self.assertEquals(response.status_code, 400)
         self.assertTrue(response.data["description"])
 
-
     def test_buyer_creating_product(self):
 
         self.client.post("/api/accounts/", self.user_buyer, format="json")
@@ -116,3 +121,27 @@ class ProductsViewsTest(APITestCase):
 
         response = self.client.get("/api/products/")
         self.assertEquals(response.status_code, 200)
+
+    def test_negative_product_quantity(self):
+
+        self.client.post("/api/accounts/", self.user_seller, format="json")
+
+        login_data = {
+            "email": self.user_seller["email"],
+            "password": self.user_seller["password"],
+        }
+
+        auth = self.client.post("/api/login/", login_data, format="json")
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION="Token " + auth.data["token"]
+        )
+
+        response = self.client.post(
+            "/api/products/",
+            self.wrong_product_negative,
+            format="json",
+        )
+
+        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.data['quantity'][0], "Ensure this value is greater than or equal to 0.")
