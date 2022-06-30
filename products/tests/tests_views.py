@@ -144,4 +144,7 @@ class ProductsViewsTest(APITestCase):
         )
 
         self.assertEquals(response.status_code, 400)
-        self.assertEquals(response.data['quantity'][0], "Ensure this value is greater than or equal to 0.")
+        self.assertEquals(
+            response.data["quantity"][0],
+            "Ensure this value is greater than or equal to 0.",
+        )

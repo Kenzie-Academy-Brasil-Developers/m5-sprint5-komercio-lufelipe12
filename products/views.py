@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import Product
 from .serializers import ProductSerializer, ProductDetailSerializer
 from .mixins import SerializerByMethodMixin
-from .permissions import CustomPermission
+from .permissions import CustomPermission, IsProductOwner
 
 
 class ProductView(SerializerByMethodMixin, generics.ListCreateAPIView):
@@ -30,7 +30,7 @@ class RetrieveUpdateDestroyAPIView(
 ):
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [CustomPermission]
+    permission_classes = [IsProductOwner]
 
     queryset = Product.objects.all()
 
@@ -38,3 +38,4 @@ class RetrieveUpdateDestroyAPIView(
         "GET": ProductDetailSerializer,
         "PATCH": ProductSerializer,
     }
+
