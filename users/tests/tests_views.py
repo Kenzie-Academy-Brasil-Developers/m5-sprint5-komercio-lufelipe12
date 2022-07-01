@@ -90,4 +90,3 @@ class UsersViewsTest(APITestCase):
         response = self.client.get("/api/accounts/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
