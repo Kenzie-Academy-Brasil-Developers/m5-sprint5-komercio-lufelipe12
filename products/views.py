@@ -38,4 +38,3 @@ class RetrieveUpdateDestroyAPIView(
         "GET": ProductDetailSerializer,
         "PATCH": ProductSerializer,
     }
-
